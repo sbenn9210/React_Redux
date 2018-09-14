@@ -3,7 +3,15 @@ const mongoose = require("mongoose");
 const keys = require("./config/keys");
 const app = express();
 const Task = require("./TaskSchema");
+const bodyParser = require("body-parser");
+const items = require("./routes/api/items");
 //DB Config
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 const db = keys.mongoURI;
 
@@ -17,20 +25,8 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
-//Getting all the the tasks
-app.get("/", (req, res) => {
-  Task.find()
-    .then(tasks => res.json(tasks))
-    .catch(err => res.status(404).json({ notasksfound: "No tasks found" }));
-});
-
-//posting a new task
-app.post("/", (req, res) => {
-  const NewTask = new Task({
-    title: req.body.title,
-    task: req.body.task
-  });
-});
+//Use routes
+app.use("/api/items", items);
 
 const port = process.env.PORT || 5000;
 
